@@ -1,0 +1,49 @@
+name: Street Fighter II AI
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  fight:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+        
+    - name: Install Python dependencies
+      run: |
+        pip install gym-retro stable-baselines3 opencv-python imageio pillow numpy
+        
+    - name: Import ROM
+      run: |
+        python -c "import retro; retro.import_roms('roms/')"
+        
+    - name: Run Street Fighter AI
+      run: python train_and_test.py
+        
+    - name: Upload Video
+      uses: actions/upload-artifact@v4
+      with:
+        name: street-fighter-video
+        path: replays/
+        retention-days: 30
+        
+    - name: Upload Model
+      uses: actions/upload-artifact@v4
+      with:
+        name: trained-model
+        path: '*.zip'
+        retention-days: 30
