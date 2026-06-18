@@ -1,0 +1,47 @@
+name: AI Fight Game - Visual
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  fight:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      run: pip install pillow numpy
+      
+    - name: Run Fight Game
+      run: python fight_game.py
+      
+    - name: Create Video
+      run: |
+        sudo apt-get update && sudo apt-get install -y ffmpeg
+        ffmpeg -y -framerate 8 -i frames/frame_%04d.png -c:v libx264 -pix_fmt yuv420p -vf "scale=800:600" AI_Fight.mp4
+      
+    - name: Create GIF
+      run: python create_gif.py
+      
+    - name: Upload Video
+      uses: actions/upload-artifact@v4
+      with:
+        name: ai-fight-video
+        path: AI_Fight.mp4
+        retention-days: 30
+        
+    - name: Upload GIF
+      uses: actions/upload-artifact@v4
+      with:
+        name: ai-fight-gif
+        path: AI_Fight.gif
+        retention-days: 30
