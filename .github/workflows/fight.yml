@@ -25,8 +25,8 @@ jobs:
         
     - name: Install Python dependencies
       run: |
-        pip install setuptools==69.5.1 setuptools_scm
-        pip install gym-retro --no-build-isolation
+        pip install setuptools==67.8.0
+        pip install gym-retro==0.8.0.post1 || pip install gym-retro
         pip install stable-baselines3 opencv-python imageio pillow numpy
         
     - name: Import ROM
